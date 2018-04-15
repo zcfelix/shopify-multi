@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: product-service
+  profiles:
+    active: dev
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.MySQLDialect
+    open-in-view: false
+  output:
+    ansi:
+      enabled: always

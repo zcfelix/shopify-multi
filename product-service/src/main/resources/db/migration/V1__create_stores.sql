@@ -1,0 +1,10 @@
+DROP TABLE IF EXISTS stores;
+CREATE TABLE `stores` (
+  `id`          BIGINT(20)   NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `owner_id`    BIGINT(20)   NOT NULL,
+  `name`        VARCHAR(100) NOT NULL,
+  `description` VARCHAR(200),
+  `created_at`  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP
+)
+  ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4;

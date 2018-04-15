@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: registry-service
+  output:
+    ansi:
+      enabled: always
+server:
+  port: 8761
+
+eureka:
+  client:
+    registerWithEureka: false
+    fetchRegistry: false
+    server:
+      waitTimeInMsWhenSyncEmpty: 0
+
+
