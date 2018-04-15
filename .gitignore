@@ -34,3 +34,11 @@
 
 ### logs
 /logs/
+/cart-service/logs/
+/inventory-service/logs/
+/order-service/logs/
+/price-service/logs/
+/product-service/logs/
+/refund-service/logs/
+/registry-service/logs/
+/user-service/logs/
