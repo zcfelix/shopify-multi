@@ -6,22 +6,24 @@ import com.thoughtworks.felix.productservice.support.ApiUnitTest;
 import io.restassured.module.mockmvc.response.MockMvcResponse;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Optional;
 
 import static com.thoughtworks.felix.productservice.support.TestHelper.outToLog;
 import static com.thoughtworks.felix.productservice.support.TestHelper.readJsonFrom;
 import static io.restassured.http.ContentType.JSON;
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
 import static org.hamcrest.core.IsCollectionContaining.hasItems;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 public class StoresApiUnitTest extends ApiUnitTest {
 
-    private static final String CREATE_STORE_URL = "/stores";
+    private static final String STORES_URL = "/stores";
     private static final Logger LOGGER = LoggerFactory.getLogger(StoresApiUnitTest.class);
 
 
@@ -34,8 +36,8 @@ public class StoresApiUnitTest extends ApiUnitTest {
     @Before
     public void setUp() {
         setUpApi(storesApi);
-        final Store fixtureStore = new Store("pet store", 999L, "felix pet store");
-        when(repository.save(ArgumentMatchers.any(Store.class))).thenReturn(fixtureStore);
+        final Store fixtureStore = new Store("pet-store", 999L, "felix pet store in test");
+        when(repository.save(any(Store.class))).thenReturn(fixtureStore);
     }
 
     @Test
@@ -45,7 +47,7 @@ public class StoresApiUnitTest extends ApiUnitTest {
                 .contentType(JSON)
                 .body(body)
                 .when()
-                .post(CREATE_STORE_URL)
+                .post(STORES_URL)
                 .then()
                 .contentType(JSON)
                 .statusCode(400)
@@ -63,7 +65,7 @@ public class StoresApiUnitTest extends ApiUnitTest {
                 .contentType(JSON)
                 .body(body)
                 .when()
-                .post(CREATE_STORE_URL)
+                .post(STORES_URL)
                 .then()
                 .contentType(JSON)
                 .statusCode(400)
@@ -79,10 +81,24 @@ public class StoresApiUnitTest extends ApiUnitTest {
                 .contentType(JSON)
                 .body(body)
                 .when()
-                .post(CREATE_STORE_URL)
+                .post(STORES_URL)
                 .then()
                 .contentType(JSON)
                 .statusCode(201)
+                .extract()
+                .response();
+        outToLog(LOGGER, response);
+    }
+
+    @Test
+    public void should_404_when_store_not_found() {
+        when(repository.findById(any(Long.class))).thenReturn(Optional.empty());
+        final MockMvcResponse response = given()
+                .when()
+                .get(STORES_URL + "/0")
+                .then()
+                .statusCode(404)
+                .body("message", hasItems("store not found"))
                 .extract()
                 .response();
         outToLog(LOGGER, response);

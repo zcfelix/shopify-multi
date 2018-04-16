@@ -4,9 +4,11 @@ import com.thoughtworks.felix.productservice.application.service.BindingResultRe
 import com.thoughtworks.felix.productservice.domain.Store;
 import com.thoughtworks.felix.productservice.domain.StoreRepository;
 import com.thoughtworks.felix.productservice.rest.dto.BatchResource;
+import com.thoughtworks.felix.productservice.rest.dto.ErrorDTO;
 import com.thoughtworks.felix.productservice.rest.dto.SingleResource;
 import com.thoughtworks.felix.productservice.rest.dto.StoreDTO;
 import com.thoughtworks.felix.productservice.rest.exceptions.BadRequestException;
+import com.thoughtworks.felix.productservice.rest.exceptions.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 
 import static java.util.stream.Collectors.toList;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
@@ -53,5 +56,19 @@ public class StoresApi {
         final URI link = linkTo(methodOn(StoresApi.class).listStores()).toUri();
 
         return new BatchResource<>(storeDTOS, link);
+    }
+
+    @GetMapping(value = "/{id}", produces = "application/json")
+    @ResponseStatus(OK)
+    public SingleResource showStore(@PathVariable("id") Long id) {
+        final Optional<Store> storeOptional = storeRepository.findById(id);
+        if (!storeOptional.isPresent()) {
+            throw new NotFoundException(ErrorDTO.builder().withMessage("store not found").build());
+        }
+
+        final StoreDTO storeDTO = new StoreDTO(storeOptional.get());
+        final URI link = linkTo(methodOn(StoresApi.class).showStore(id)).toUri();
+
+        return new SingleResource<>(storeDTO, link);
     }
 }

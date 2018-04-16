@@ -16,7 +16,7 @@ public class ExceptionHandlers {
 
     @ExceptionHandler(value = ShopifyInternalException.class)
     public ResponseEntity shopifyInternalExceptionHandler(ShopifyInternalException e) {
-        return ResponseEntity.badRequest().body(e.getErrors());
+        return ResponseEntity.status(e.httpStatus()).body(e.getErrors());
     }
 
     @ExceptionHandler(value = InvalidFormatException.class)

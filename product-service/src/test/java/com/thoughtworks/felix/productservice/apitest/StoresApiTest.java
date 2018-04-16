@@ -40,7 +40,7 @@ public class StoresApiTest extends ApiTest {
 
     @Test
     @SqlGroup({
-            @Sql(executionPhase = BEFORE_TEST_METHOD, scripts = "classpath:/sql/insert-store.sql")
+            @Sql(executionPhase = BEFORE_TEST_METHOD, scripts = "/sql/insert-store.sql")
     })
     public void should_return_200_when_list_all_stores_success() {
         final Response response = given()
@@ -48,6 +48,25 @@ public class StoresApiTest extends ApiTest {
                 .get(STORES_URL)
                 .then()
                 .statusCode(200)
+                .body("data[0].name", is("pet-store"))
+                .body("links.self", endsWith("/stores"))
+                .extract()
+                .response();
+        outToLog(LOGGER, response);
+    }
+
+    @Test
+    @SqlGroup({
+            @Sql(executionPhase = BEFORE_TEST_METHOD, scripts = "/sql/insert-store.sql")
+    })
+    public void should_return_200_when_show_a_store_success() {
+        final Response response = given()
+                .when()
+                .get(STORES_URL + "/1")
+                .then()
+                .statusCode(200)
+                .body("data.name", is("pet-store"))
+                .body("links.self", endsWith("/stores/1"))
                 .extract()
                 .response();
         outToLog(LOGGER, response);
