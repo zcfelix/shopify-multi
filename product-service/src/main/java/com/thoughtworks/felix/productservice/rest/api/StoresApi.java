@@ -1,14 +1,13 @@
 package com.thoughtworks.felix.productservice.rest.api;
 
-import com.thoughtworks.felix.productservice.application.service.BindingResultResolver;
+import com.thoughtworks.felix.productservice.domain.Product;
+import com.thoughtworks.felix.productservice.domain.ProductRepository;
 import com.thoughtworks.felix.productservice.domain.Store;
 import com.thoughtworks.felix.productservice.domain.StoreRepository;
-import com.thoughtworks.felix.productservice.rest.dto.BatchResource;
-import com.thoughtworks.felix.productservice.rest.dto.ErrorDTO;
-import com.thoughtworks.felix.productservice.rest.dto.SingleResource;
-import com.thoughtworks.felix.productservice.rest.dto.StoreDTO;
+import com.thoughtworks.felix.productservice.rest.dto.*;
 import com.thoughtworks.felix.productservice.rest.exceptions.BadRequestException;
 import com.thoughtworks.felix.productservice.rest.exceptions.NotFoundException;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +17,9 @@ import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
+import static com.thoughtworks.felix.productservice.application.service.BindingResultResolver.parseErrors;
 import static java.util.stream.Collectors.toList;
+import static org.modelmapper.config.Configuration.AccessLevel.PRIVATE;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 import static org.springframework.http.HttpStatus.CREATED;
@@ -28,8 +29,17 @@ import static org.springframework.http.HttpStatus.OK;
 @RequestMapping("/stores")
 public class StoresApi {
 
+    private final StoreRepository storeRepository;
+    private final ProductRepository productRepository;
+    private ModelMapper modelMapper;
+
     @Autowired
-    private StoreRepository storeRepository;
+    public StoresApi(StoreRepository storeRepository, ProductRepository productRepository) {
+        this.storeRepository = storeRepository;
+        this.productRepository = productRepository;
+        this.modelMapper = new ModelMapper();
+        modelMapper.getConfiguration().setFieldAccessLevel(PRIVATE).setMethodAccessLevel(PRIVATE);
+    }
 
     @PostMapping(produces = "application/json")
     @ResponseStatus(CREATED)
@@ -37,11 +47,11 @@ public class StoresApi {
                                       BindingResult result) {
 
         if (result.hasErrors()) {
-            throw new BadRequestException(BindingResultResolver.parseErrors(result));
+            throw new BadRequestException(parseErrors(result));
         }
 
-        final Store saved = storeRepository.save(storeDTO.toDomain());
-        final StoreDTO responseDTO = new StoreDTO(saved);
+        final Store saved = storeRepository.save(modelMapper.map(storeDTO, Store.class));
+        final StoreDTO responseDTO = modelMapper.map(saved, StoreDTO.class);
         URI link = linkTo(methodOn(StoresApi.class).createStore(storeDTO, result)).toUri();
 
         return new SingleResource<>(responseDTO, link);
@@ -52,7 +62,7 @@ public class StoresApi {
     public BatchResource listStores() {
 
         final List<Store> all = storeRepository.findAll();
-        final List<StoreDTO> storeDTOS = all.stream().map(StoreDTO::new).collect(toList());
+        final List<StoreDTO> storeDTOS = all.stream().map(x -> modelMapper.map(x, StoreDTO.class)).collect(toList());
         final URI link = linkTo(methodOn(StoresApi.class).listStores()).toUri();
 
         return new BatchResource<>(storeDTOS, link);
@@ -66,9 +76,32 @@ public class StoresApi {
             throw new NotFoundException(ErrorDTO.builder().withMessage("store not found").build());
         }
 
-        final StoreDTO storeDTO = new StoreDTO(storeOptional.get());
+        final StoreDTO storeDTO = modelMapper.map(storeOptional.get(), StoreDTO.class);
         final URI link = linkTo(methodOn(StoresApi.class).showStore(id)).toUri();
 
         return new SingleResource<>(storeDTO, link);
     }
+
+    @PostMapping(value = "{id}/products", produces = "application/json")
+    @ResponseStatus(CREATED)
+    public SingleResource createProduct(@PathVariable("id") Long storeId,
+                                        @Valid @RequestBody ProductDTO productDTO,
+                                        BindingResult result) {
+        if (result.hasErrors()) {
+            throw new BadRequestException(parseErrors(result));
+        }
+
+        final Optional<Store> storeOptional = storeRepository.findById(storeId);
+        if (!storeOptional.isPresent()) {
+            throw new NotFoundException(ErrorDTO.builder().withMessage("store not found").build());
+        }
+
+        final Product product = new Product(storeId, productDTO.getName(), productDTO.getDescription());
+        final Product saved = productRepository.save(product);
+        final ProductDTO responseDTO = modelMapper.map(saved, ProductDTO.class);
+        final URI link = linkTo(methodOn(StoresApi.class).createProduct(storeId, productDTO, result)).toUri();
+
+        return new SingleResource<>(responseDTO, link);
+    }
+
 }

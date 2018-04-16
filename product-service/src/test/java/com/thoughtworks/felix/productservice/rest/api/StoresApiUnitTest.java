@@ -103,4 +103,34 @@ public class StoresApiUnitTest extends ApiUnitTest {
                 .response();
         outToLog(LOGGER, response);
     }
+
+    @Test
+    public void should_400_when_create_product_with_empty_product_name() {
+        final String body = readJsonFrom("request/create-product-empty-name-400.json");
+        final MockMvcResponse response = given()
+                .contentType(JSON)
+                .body(body)
+                .when()
+                .post(STORES_URL + "/1/products")
+                .then()
+                .statusCode(400)
+                .extract()
+                .response();
+        outToLog(LOGGER, response);
+    }
+
+    @Test
+    public void should_404_when_create_product_with_non_exist_store() {
+        final String body = readJsonFrom("request/create-product-201.json");
+        final MockMvcResponse response = given()
+                .contentType(JSON)
+                .body(body)
+                .when()
+                .post(STORES_URL + "/0/products")
+                .then()
+                .statusCode(404)
+                .extract()
+                .response();
+        outToLog(LOGGER, response);
+    }
 }
