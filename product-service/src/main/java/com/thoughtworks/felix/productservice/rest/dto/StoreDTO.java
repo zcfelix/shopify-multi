@@ -3,6 +3,7 @@ package com.thoughtworks.felix.productservice.rest.dto;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonRootName;
 import com.thoughtworks.felix.productservice.domain.Store;
 
 import javax.validation.constraints.Min;
@@ -10,6 +11,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
+@JsonRootName("data")
 public class StoreDTO {
     @JsonProperty
     private Long id;
