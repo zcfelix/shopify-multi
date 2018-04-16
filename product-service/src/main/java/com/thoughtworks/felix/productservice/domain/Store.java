@@ -33,19 +33,31 @@ public class Store {
         this.description = description;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public Long getOwnerId() {
-        return ownerId;
-    }
-
     public String getName() {
         return name;
     }
 
     public String getDescription() {
         return description;
+    }
+
+    @SuppressWarnings("unused")
+    private void setId(Long id) {
+        this.id = id;
+    }
+
+    @SuppressWarnings("unused")
+    private void setOwnerId(Long ownerId) {
+        this.ownerId = ownerId;
+    }
+
+    @SuppressWarnings("unused")
+    private void setName(String name) {
+        this.name = name;
+    }
+
+    @SuppressWarnings("unused")
+    private void setDescription(String description) {
+        this.description = description;
     }
 }

@@ -71,4 +71,24 @@ public class StoresApiTest extends ApiTest {
                 .response();
         outToLog(LOGGER, response);
     }
+
+    @Test
+    @SqlGroup({
+            @Sql(executionPhase = BEFORE_TEST_METHOD, scripts = "/sql/insert-store.sql")
+    })
+    public void should_return_201_when_create_a_product_success() {
+        final String body = readJsonFrom("request/create-product-201.json");
+        final Response response = given()
+                .when()
+                .contentType(JSON)
+                .body(body)
+                .post(STORES_URL + "/1/products")
+                .then()
+                .statusCode(201)
+                .body("data.name", is("pet test"))
+                .body("data.description", is("lovely pet test"))
+                .extract()
+                .response();
+        outToLog(LOGGER, response);
+    }
 }
