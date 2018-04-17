@@ -2,6 +2,9 @@ package com.thoughtworks.felix.productservice.domain;
 
 import javax.persistence.*;
 
+import static com.thoughtworks.felix.productservice.domain.ProductState.SHELVE;
+import static com.thoughtworks.felix.productservice.domain.ProductState.UNSHELVE;
+
 @Entity
 @Table(name = "products")
 public class Product {
@@ -17,6 +20,10 @@ public class Product {
 
     private String description;
 
+    @Enumerated(EnumType.STRING)
+    @SuppressWarnings("unused")
+    private ProductState state;
+
     @SuppressWarnings("unused")
     private Product() {
     }
@@ -25,6 +32,7 @@ public class Product {
         this.storeId = storeId;
         this.name = name;
         this.description = description;
+        this.state = SHELVE;
     }
 
     public String getDescription() {
@@ -33,5 +41,15 @@ public class Product {
 
     public String getName() {
         return name;
+    }
+
+    public Product unload() {
+        this.state = UNSHELVE;
+        return this;
+    }
+
+    public Product upload() {
+        this.state = SHELVE;
+        return this;
     }
 }

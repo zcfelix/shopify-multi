@@ -9,6 +9,7 @@ import com.thoughtworks.felix.productservice.rest.exceptions.BadRequestException
 import com.thoughtworks.felix.productservice.rest.exceptions.NotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,8 +23,7 @@ import static java.util.stream.Collectors.toList;
 import static org.modelmapper.config.Configuration.AccessLevel.PRIVATE;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
-import static org.springframework.http.HttpStatus.CREATED;
-import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.HttpStatus.*;
 
 @RestController
 @RequestMapping("/stores")
@@ -111,6 +111,46 @@ public class StoresApi {
         final URI link = linkTo(methodOn(StoresApi.class).listProducts(storeId)).toUri();
 
         return new BatchResource<>(allInStore.stream().map(x -> modelMapper.map(x, ProductDTO.class)).collect(toList()), link);
+    }
+
+    @PutMapping(value = "{id}/products/{productId}/unloading", produces = "application/json")
+    @ResponseStatus(NO_CONTENT)
+    public ResponseEntity unloadProduct(@PathVariable("id") Long storeId,
+                                        @PathVariable("productId") Long productId) {
+        final Optional<Store> storeOptional = storeRepository.findById(storeId);
+        if (!storeOptional.isPresent()) {
+            throw new NotFoundException(ErrorDTO.builder().withMessage("store not found").build());
+        }
+
+        final Optional<Product> productOptional = productRepository.findByIdAndStoreId(productId, storeId);
+        if (!productOptional.isPresent()) {
+            throw new NotFoundException(ErrorDTO.builder().withMessage("product not found").build());
+        }
+
+        final Product unloadingProduct = productOptional.get().unload();
+        productRepository.save(unloadingProduct);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping(value = "{id}/products/{productId}/uploading", produces = "application/json")
+    @ResponseStatus(NO_CONTENT)
+    public ResponseEntity uploadProduct(@PathVariable("id") Long storeId,
+                                        @PathVariable("productId") Long productId) {
+        final Optional<Store> storeOptional = storeRepository.findById(storeId);
+        if (!storeOptional.isPresent()) {
+            throw new NotFoundException(ErrorDTO.builder().withMessage("store not found").build());
+        }
+
+        final Optional<Product> productOptional = productRepository.findByIdAndStoreId(productId, storeId);
+        if (!productOptional.isPresent()) {
+            throw new NotFoundException(ErrorDTO.builder().withMessage("product not found").build());
+        }
+
+        final Product uploadingProduct = productOptional.get().upload();
+        productRepository.save(uploadingProduct);
+
+        return ResponseEntity.noContent().build();
     }
 
 }

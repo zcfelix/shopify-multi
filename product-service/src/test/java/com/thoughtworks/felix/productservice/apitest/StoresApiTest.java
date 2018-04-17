@@ -12,10 +12,13 @@ import static com.thoughtworks.felix.productservice.support.TestHelper.outToLog;
 import static com.thoughtworks.felix.productservice.support.TestHelper.readJsonFrom;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
-import static org.hamcrest.CoreMatchers.endsWith;
-import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.*;
 import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.BEFORE_TEST_METHOD;
 
+@SqlGroup({
+        @Sql(executionPhase = BEFORE_TEST_METHOD, scripts = "classpath:sql/insert-store.sql"),
+        @Sql(executionPhase = BEFORE_TEST_METHOD, scripts = "classpath:sql/insert-products.sql")
+})
 public class StoresApiTest extends ApiTest {
 
     private static final String STORES_URL = "/stores";
@@ -39,9 +42,6 @@ public class StoresApiTest extends ApiTest {
     }
 
     @Test
-    @SqlGroup({
-            @Sql(executionPhase = BEFORE_TEST_METHOD, scripts = "/sql/insert-store.sql")
-    })
     public void should_return_200_when_list_all_stores_success() {
         final Response response = given()
                 .when()
@@ -56,9 +56,6 @@ public class StoresApiTest extends ApiTest {
     }
 
     @Test
-    @SqlGroup({
-            @Sql(executionPhase = BEFORE_TEST_METHOD, scripts = "/sql/insert-store.sql")
-    })
     public void should_return_200_when_show_a_store_success() {
         final Response response = given()
                 .when()
@@ -73,9 +70,6 @@ public class StoresApiTest extends ApiTest {
     }
 
     @Test
-    @SqlGroup({
-            @Sql(executionPhase = BEFORE_TEST_METHOD, scripts = "/sql/insert-store.sql")
-    })
     public void should_return_201_when_create_a_product_success() {
         final String body = readJsonFrom("request/create-product-201.json");
         final Response response = given()
@@ -94,18 +88,34 @@ public class StoresApiTest extends ApiTest {
 
 
     @Test
-    @SqlGroup({
-            @Sql(executionPhase = BEFORE_TEST_METHOD, scripts = "classpath:sql/insert-store.sql"),
-            @Sql(executionPhase = BEFORE_TEST_METHOD, scripts = "classpath:sql/insert-products.sql")
-    })
     public void should_return_200_when_list_products_of_store_success() {
         final Response response = given()
                 .when()
                 .get(STORES_URL + "/1/products")
                 .then()
                 .statusCode(200)
+                .body("data.name", hasItems("dog", "cat"))
+                .body("data.size()", is(3))
                 .extract()
                 .response();
         outToLog(LOGGER, response);
+    }
+
+    @Test
+    public void should_return_204_when_unloading_product_success() {
+        given()
+                .when()
+                .put(STORES_URL + "/1/products/1/unloading")
+                .then()
+                .statusCode(204);
+    }
+
+    @Test
+    public void should_return_204_when_uploading_product_success() {
+        given()
+                .when()
+                .put(STORES_URL + "/1/products/4/uploading")
+                .then()
+                .statusCode(204);
     }
 }
