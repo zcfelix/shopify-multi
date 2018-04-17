@@ -43,6 +43,21 @@ public class Product {
         return name;
     }
 
+    @SuppressWarnings("unused")
+    private Long getId() {
+        return id;
+    }
+
+    @SuppressWarnings("unused")
+    private Long getStoreId() {
+        return storeId;
+    }
+
+    @SuppressWarnings("unused")
+    private ProductState getState() {
+        return state;
+    }
+
     public Product unload() {
         this.state = UNSHELVE;
         return this;

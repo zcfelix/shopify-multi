@@ -1,6 +1,5 @@
 package com.thoughtworks.felix.productservice.rest.dto;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -22,7 +21,10 @@ public class ProductDTO {
     @JsonProperty
     private String description;
 
-    @JsonCreator
+    @JsonProperty
+    private String state;
+
+    @SuppressWarnings("unused")
     private ProductDTO() {
     }
 
@@ -34,6 +36,20 @@ public class ProductDTO {
         return description;
     }
 
+    @SuppressWarnings("unused")
+    private Long getId() {
+        return id;
+    }
+
+    @SuppressWarnings("unused")
+    private Long getStoreId() {
+        return storeId;
+    }
+
+    @SuppressWarnings("unused")
+    public String getState() {
+        return state;
+    }
 
     @SuppressWarnings("unused")
     private void setId(Long id) {
@@ -53,5 +69,10 @@ public class ProductDTO {
     @SuppressWarnings("unused")
     private void setDescription(String description) {
         this.description = description;
+    }
+
+    @SuppressWarnings("unused")
+    private void setState(String state) {
+        this.state = state;
     }
 }
