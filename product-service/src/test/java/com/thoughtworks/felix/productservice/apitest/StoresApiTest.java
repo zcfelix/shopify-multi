@@ -91,4 +91,21 @@ public class StoresApiTest extends ApiTest {
                 .response();
         outToLog(LOGGER, response);
     }
+
+
+    @Test
+    @SqlGroup({
+            @Sql(executionPhase = BEFORE_TEST_METHOD, scripts = "classpath:sql/insert-store.sql"),
+            @Sql(executionPhase = BEFORE_TEST_METHOD, scripts = "classpath:sql/insert-products.sql")
+    })
+    public void should_return_200_when_list_products_of_store_success() {
+        final Response response = given()
+                .when()
+                .get(STORES_URL + "/1/products")
+                .then()
+                .statusCode(200)
+                .extract()
+                .response();
+        outToLog(LOGGER, response);
+    }
 }

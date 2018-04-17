@@ -51,10 +51,9 @@ public class StoresApi {
         }
 
         final Store saved = storeRepository.save(modelMapper.map(storeDTO, Store.class));
-        final StoreDTO responseDTO = modelMapper.map(saved, StoreDTO.class);
         URI link = linkTo(methodOn(StoresApi.class).createStore(storeDTO, result)).toUri();
 
-        return new SingleResource<>(responseDTO, link);
+        return new SingleResource<>(modelMapper.map(saved, StoreDTO.class), link);
     }
 
     @GetMapping(produces = "application/json")
@@ -102,6 +101,16 @@ public class StoresApi {
         final URI link = linkTo(methodOn(StoresApi.class).createProduct(storeId, productDTO, result)).toUri();
 
         return new SingleResource<>(responseDTO, link);
+    }
+
+    @GetMapping(value = "{id}/products", produces = "application/json")
+    @ResponseStatus(OK)
+    public BatchResource listProducts(@PathVariable("id") Long storeId) {
+
+        final List<Product> allInStore = productRepository.findAllByStoreId(storeId);
+        final URI link = linkTo(methodOn(StoresApi.class).listProducts(storeId)).toUri();
+
+        return new BatchResource<>(allInStore.stream().map(x -> modelMapper.map(x, ProductDTO.class)).collect(toList()), link);
     }
 
 }
