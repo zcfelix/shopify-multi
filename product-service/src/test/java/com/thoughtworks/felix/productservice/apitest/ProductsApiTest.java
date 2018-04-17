@@ -1,4 +1,4 @@
-package com.thoughtworks.felix.productservice.rest.api;
+package com.thoughtworks.felix.productservice.apitest;
 
 import com.thoughtworks.felix.productservice.support.ApiTest;
 import io.restassured.response.Response;
@@ -21,6 +21,7 @@ public class ProductsApiTest extends ApiTest{
 
     private static final String PRODUCTS_URL = "/products";
     private static final Logger LOGGER = LoggerFactory.getLogger(ProductsApiTest.class);
+
     @Test
     public void should_return_200_when_list_all_products() {
         final Response response = given()
@@ -31,6 +32,20 @@ public class ProductsApiTest extends ApiTest{
                 .body("data.size()", is(4))
                 .body("data.name", hasItems("dog", "cat", "elephant", "fish"))
                 .body("links.self", endsWith("/products"))
+                .extract()
+                .response();
+        outToLog(LOGGER, response);
+    }
+
+    @Test
+    public void should_return_200_when_find_product_success() {
+        final Response response = given()
+                .when()
+                .get(PRODUCTS_URL + "/1")
+                .then()
+                .statusCode(200)
+                .body("data.name", is("dog"))
+                .body("links.self", endsWith("/products/1"))
                 .extract()
                 .response();
         outToLog(LOGGER, response);
