@@ -33,6 +33,16 @@ public class Store {
         this.description = description;
     }
 
+    @SuppressWarnings("unused")
+    private Long getId() {
+        return id;
+    }
+
+    @SuppressWarnings("unused")
+    private Long getOwnerId() {
+        return ownerId;
+    }
+
     public String getName() {
         return name;
     }

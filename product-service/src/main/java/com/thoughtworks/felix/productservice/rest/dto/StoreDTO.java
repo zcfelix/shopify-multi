@@ -52,6 +52,11 @@ public class StoreDTO {
         return this;
     }
 
+    @SuppressWarnings("unused")
+    private Long getId() {
+        return id;
+    }
+
     public Long getOwnerId() {
         return ownerId;
     }
