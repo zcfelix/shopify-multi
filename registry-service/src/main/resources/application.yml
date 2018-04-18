@@ -1,6 +1,8 @@
 spring:
   application:
     name: registry-service
+  profiles:
+    active: dev
   output:
     ansi:
       enabled: always
@@ -11,7 +13,5 @@ eureka:
   client:
     registerWithEureka: false
     fetchRegistry: false
-    server:
-      waitTimeInMsWhenSyncEmpty: 0
 
 

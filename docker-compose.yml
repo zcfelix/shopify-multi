@@ -1,0 +1,59 @@
+version: '3.0'
+
+networks:
+  microservices:
+
+services:
+  registry-service:
+    container_name: registry-service
+    image: felix/registry-service
+    expose:
+      - 8761
+    networks:
+      - microservices
+  shopify-db:
+    container_name: shopify-db-container
+    image: mysql:latest
+    expose:
+      - 3306
+    volumes:
+      - /Users/ybzhou/sql-data/shopify-data-container:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=product_service
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=password
+    networks:
+      - microservices
+  product-service:
+    container_name: product-service
+    image: felix/product-service
+    depends_on:
+      - shopify-db
+      - registry-service
+    expose:
+      - 8081
+    environment:
+      - DATABASE_HOST=shopify-db
+      - DATABASE_PORT=3306
+      - DATABASE_USER=user
+      - DATABASE_PASSWORD=password
+      - DATABASE_NAME=product_service
+      - EUREKA_HOST=registry-service
+      - EUREKA_PORT=8761
+    networks:
+      - microservices
+    links:
+      - registry-service
+  nginx-proxy:
+    container_name: nginx-proxy
+    image: nginx:latest
+    volumes:
+      - /Users/ybzhou/ThoughtWorks/Titan/shopify-multi/nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - 80:80
+    links:
+      - registry-service
+      - product-service
+    networks:
+      - microservices

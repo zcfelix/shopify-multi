@@ -13,3 +13,7 @@ spring:
     user: ${DATABASE_USER}
     password: ${DATABASE_PASSWORD}
     url: jdbc:mysql://${DATABASE_HOST}:${DATABASE_PORT}/${DATABASE_NAME}?autoReconnect=true&useSSL=false
+eureka:
+  client:
+    service-url:
+      defaultZone: http://${EUREKA_HOST}:${EUREKA_PORT}/eureka
