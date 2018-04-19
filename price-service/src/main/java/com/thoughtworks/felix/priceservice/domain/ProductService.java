@@ -1,13 +1,20 @@
 package com.thoughtworks.felix.priceservice.domain;
 
-import com.thoughtworks.felix.priceservice.rest.dto.SingleResource;
-import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import com.thoughtworks.felix.priceservice.infrastructure.ProductClient;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-@FeignClient(name = "PRODUCT-SERVICE", decode404 = true)
-public interface ProductService {
+@Service
+public class ProductService {
 
-    @GetMapping(value = "/products/{id}")
-    SingleResource showProduct(@PathVariable("id") Long id);
+    public final ProductClient productClient;
+
+    @Autowired
+    public ProductService(ProductClient productClient) {
+        this.productClient = productClient;
+    }
+
+    public boolean isProductExist(Long productId) {
+        return productClient.showProduct(productId).getStatusCode().is2xxSuccessful();
+    }
 }

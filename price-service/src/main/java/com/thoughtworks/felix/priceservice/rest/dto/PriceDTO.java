@@ -11,11 +11,25 @@ import java.sql.Timestamp;
 public class PriceDTO {
 
     @JsonProperty
+    private Long id;
+
+    @JsonProperty("product_id")
+    private Long productId;
+
+    @JsonProperty
     @Min(0)
     private BigDecimal amount;
 
     @JsonProperty("crated_at")
     private Timestamp createdAt;
+
+    private void setId(Long id) {
+        this.id = id;
+    }
+
+    private void setProductId(Long productId) {
+        this.productId = productId;
+    }
 
     private void setAmount(BigDecimal amount) {
         this.amount = amount;
@@ -31,5 +45,13 @@ public class PriceDTO {
 
     public Timestamp getCreatedAt() {
         return createdAt;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public Long getProductId() {
+        return productId;
     }
 }
