@@ -1,6 +1,7 @@
 package com.thoughtworks.felix.priceservice.domain;
 
-import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.Generated;
+import org.hibernate.annotations.GenerationTime;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -20,7 +21,7 @@ public class Price {
     private BigDecimal amount;
 
     @Column(name = "created_at")
-    @CreationTimestamp
+    @Generated(GenerationTime.INSERT)
     private Timestamp createdAt;
 
     private Price() {

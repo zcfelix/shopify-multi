@@ -2,7 +2,6 @@ package com.thoughtworks.felix.priceservice.apitest;
 
 import com.thoughtworks.felix.priceservice.domain.ProductService;
 import com.thoughtworks.felix.priceservice.support.ApiTest;
-import com.thoughtworks.felix.priceservice.support.CustomMatchers;
 import io.restassured.response.Response;
 import org.junit.Before;
 import org.junit.Test;
