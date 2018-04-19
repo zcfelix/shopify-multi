@@ -1,4 +1,4 @@
-package com.thoughtworks.felix.productservice.rest.dto;
+package com.thoughtworks.felix.priceservice.rest.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

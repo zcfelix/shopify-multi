@@ -1,0 +1,9 @@
+DROP TABLE IF EXISTS prices;
+CREATE TABLE `prices` (
+  `id`         BIGINT(20)     NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `product_id` BIGINT(20)     NOT NULL,
+  `amount`     DECIMAL(10, 2) NOT NULL,
+  `created_at` TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP
+)
+  ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4;
