@@ -18,6 +18,7 @@ services:
     expose:
       - 3306
     volumes:
+      - /Users/ybzhou/ThoughtWorks/Titan/shopify-multi/product-service/src/main/resources/db/migration:/docker-entrypoint-initdb.d
       - /Users/ybzhou/sql-data/shopify-data-container:/var/lib/mysql
     environment:
       - MYSQL_ROOT_PASSWORD=root
@@ -52,6 +53,7 @@ services:
     expose:
       - 3306
     volumes:
+      - /Users/ybzhou/ThoughtWorks/Titan/shopify-multi/price-service/src/main/resources/db/migration:/docker-entrypoint-initdb.d
       - /Users/ybzhou/sql-data/price-service-data-container:/var/lib/mysql
     environment:
       - MYSQL_ROOT_PASSWORD=root
