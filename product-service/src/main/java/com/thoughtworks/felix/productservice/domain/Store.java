@@ -34,7 +34,7 @@ public class Store {
     }
 
     @SuppressWarnings("unused")
-    private Long getId() {
+    public Long getId() {
         return id;
     }
 

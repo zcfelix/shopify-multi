@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlGroup;
 
+import static com.thoughtworks.felix.productservice.support.CustomMatchers.matchesRegex;
 import static com.thoughtworks.felix.productservice.support.TestHelper.outToLog;
 import static com.thoughtworks.felix.productservice.support.TestHelper.readJsonFrom;
 import static io.restassured.RestAssured.given;
@@ -35,7 +36,7 @@ public class StoresApiTest extends ApiTest {
                 .then()
                 .statusCode(201)
                 .body("data.name", is("pet store"))
-                .body("links.self", endsWith("/stores"))
+                .body("links.self", matchesRegex(".*/stores/[0-9]+"))
                 .extract()
                 .response();
         outToLog(LOGGER, response);
@@ -63,7 +64,7 @@ public class StoresApiTest extends ApiTest {
                 .then()
                 .statusCode(200)
                 .body("data.name", is("pet-store"))
-                .body("links.self", endsWith("/stores/1"))
+                .body("links.self", matchesRegex(".*/stores/[0-9]+"))
                 .extract()
                 .response();
         outToLog(LOGGER, response);
@@ -79,6 +80,7 @@ public class StoresApiTest extends ApiTest {
                 .post(STORES_URL + "/1/products")
                 .then()
                 .statusCode(201)
+                .body("links.self", matchesRegex(".*/stores/[0-9]+/products/[0-9]+"))
                 .body("data.name", is("pet test"))
                 .body("data.description", is("lovely pet test"))
                 .extract()
@@ -94,6 +96,7 @@ public class StoresApiTest extends ApiTest {
                 .get(STORES_URL + "/1/products")
                 .then()
                 .statusCode(200)
+                .body("links.self", matchesRegex(".*/stores/[0-9]+/products"))
                 .body("data.name", hasItems("dog", "cat"))
                 .body("data.size()", is(3))
                 .extract()

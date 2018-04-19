@@ -43,7 +43,7 @@ public class StoresApi {
 
     @PostMapping(produces = "application/json")
     @ResponseStatus(CREATED)
-    public SingleResource createStore(@Valid @RequestBody StoreDTO storeDTO,
+    public ResponseEntity createStore(@Valid @RequestBody StoreDTO storeDTO,
                                       BindingResult result) {
 
         if (result.hasErrors()) {
@@ -51,39 +51,35 @@ public class StoresApi {
         }
 
         final Store saved = storeRepository.save(modelMapper.map(storeDTO, Store.class));
-        URI link = linkTo(methodOn(StoresApi.class).createStore(storeDTO, result)).toUri();
+        final URI link = linkTo(StoresApi.class).slash(saved.getId()).toUri();
 
-        return new SingleResource<>(modelMapper.map(saved, StoreDTO.class), link);
+        return ResponseEntity.created(link).body(new SingleResource<>(modelMapper.map(saved, StoreDTO.class), link));
     }
 
     @GetMapping(produces = "application/json")
     @ResponseStatus(OK)
-    public BatchResource listStores() {
+    public ResponseEntity listStores() {
 
         final List<Store> all = storeRepository.findAll();
         final List<StoreDTO> storeDTOS = all.stream().map(x -> modelMapper.map(x, StoreDTO.class)).collect(toList());
         final URI link = linkTo(methodOn(StoresApi.class).listStores()).toUri();
 
-        return new BatchResource<>(storeDTOS, link);
+        return ResponseEntity.ok(new BatchResource<>(storeDTOS, link));
     }
 
     @GetMapping(value = "/{id}", produces = "application/json")
     @ResponseStatus(OK)
-    public SingleResource showStore(@PathVariable("id") Long id) {
-        final Optional<Store> storeOptional = storeRepository.findById(id);
-        if (!storeOptional.isPresent()) {
-            throw new NotFoundException(ErrorDTO.builder().withMessage("store not found").build());
-        }
-
-        final StoreDTO storeDTO = modelMapper.map(storeOptional.get(), StoreDTO.class);
+    public ResponseEntity showStore(@PathVariable("id") Long id) {
         final URI link = linkTo(methodOn(StoresApi.class).showStore(id)).toUri();
 
-        return new SingleResource<>(storeDTO, link);
+        return storeRepository.findById(id)
+                .map(x -> ResponseEntity.ok(new SingleResource<>(modelMapper.map(x, StoreDTO.class), link)))
+                .orElseThrow(() -> new NotFoundException(ErrorDTO.builder().withMessage("store not found").build()));
     }
 
     @PostMapping(value = "{id}/products", produces = "application/json")
     @ResponseStatus(CREATED)
-    public SingleResource createProduct(@PathVariable("id") Long storeId,
+    public ResponseEntity createProduct(@PathVariable("id") Long storeId,
                                         @Valid @RequestBody ProductDTO productDTO,
                                         BindingResult result) {
         if (result.hasErrors()) {
@@ -98,19 +94,19 @@ public class StoresApi {
         final Product product = new Product(storeId, productDTO.getName(), productDTO.getDescription());
         final Product saved = productRepository.save(product);
         final ProductDTO responseDTO = modelMapper.map(saved, ProductDTO.class);
-        final URI link = linkTo(methodOn(StoresApi.class).createProduct(storeId, productDTO, result)).toUri();
 
-        return new SingleResource<>(responseDTO, link);
+        final URI link = linkTo(methodOn(StoresApi.class).createProduct(storeId, productDTO, result)).slash(saved.getId()).toUri();
+        return ResponseEntity.created(link).body(new SingleResource<>(responseDTO, link));
     }
 
     @GetMapping(value = "{id}/products", produces = "application/json")
     @ResponseStatus(OK)
-    public BatchResource listProducts(@PathVariable("id") Long storeId) {
+    public ResponseEntity listProducts(@PathVariable("id") Long storeId) {
 
         final List<Product> allInStore = productRepository.findAllByStoreId(storeId);
         final URI link = linkTo(methodOn(StoresApi.class).listProducts(storeId)).toUri();
 
-        return new BatchResource<>(allInStore.stream().map(x -> modelMapper.map(x, ProductDTO.class)).collect(toList()), link);
+        return ResponseEntity.ok(new BatchResource<>(allInStore.stream().map(x -> modelMapper.map(x, ProductDTO.class)).collect(toList()), link));
     }
 
     @PutMapping(value = "{id}/products/{productId}/unloading", produces = "application/json")

@@ -10,6 +10,7 @@ import com.thoughtworks.felix.productservice.rest.exceptions.NotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -36,7 +37,7 @@ public class ProductsApi {
 
     @GetMapping(produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
-    public BatchResource listAllProducts() {
+    public ResponseEntity listAllProducts() {
         final List<Product> all = productRepository.findAll();
         final List<ProductDTO> productDTOS = all
                 .stream()
@@ -44,17 +45,17 @@ public class ProductsApi {
                 .collect(toList());
         URI link = linkTo(methodOn(ProductsApi.class).listAllProducts()).toUri();
 
-        return new BatchResource<>(productDTOS, link);
+        return ResponseEntity.ok(new BatchResource<>(productDTOS, link));
     }
 
     @GetMapping(value = "/{id}", produces = "application/json")
     @ResponseStatus(HttpStatus.OK)
-    public SingleResource showProduct(@PathVariable("id") Long id) {
+    public ResponseEntity showProduct(@PathVariable("id") Long id) {
 
         URI link = linkTo(methodOn(ProductsApi.class).showProduct(id)).toUri();
 
         return productRepository.findById(id)
-                .map(x -> new SingleResource<>(modelMapper.map(x, ProductDTO.class), link))
+                .map(x -> ResponseEntity.ok(new SingleResource<>(modelMapper.map(x, ProductDTO.class), link)))
                 .orElseThrow(() -> new NotFoundException(ErrorDTO.builder().withMessage("product not found").build()));
 
     }

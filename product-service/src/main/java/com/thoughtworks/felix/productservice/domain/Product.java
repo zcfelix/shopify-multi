@@ -44,7 +44,7 @@ public class Product {
     }
 
     @SuppressWarnings("unused")
-    private Long getId() {
+    public Long getId() {
         return id;
     }
 
