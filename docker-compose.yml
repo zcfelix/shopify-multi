@@ -11,6 +11,7 @@ services:
       - 8761
     networks:
       - microservices
+
   shopify-db:
     container_name: shopify-db-container
     image: mysql:latest
@@ -25,6 +26,7 @@ services:
       - MYSQL_PASSWORD=password
     networks:
       - microservices
+
   product-service:
     container_name: product-service
     image: felix/product-service
@@ -43,8 +45,41 @@ services:
       - EUREKA_PORT=8761
     networks:
       - microservices
-    links:
+
+  price-service-db:
+    container_name: price-service-db-container
+    image: mysql:latest
+    expose:
+      - 3306
+    volumes:
+      - /Users/ybzhou/sql-data/price-service-data-container:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=price_service
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=password
+    networks:
+      - microservices
+
+  price-service:
+    container_name: price-service
+    image: felix/price-service
+    depends_on:
+      - price-service-db
       - registry-service
+    expose:
+      - 8082
+    environment:
+      - DATABASE_HOST=price-service-db
+      - DATABASE_PORT=3306
+      - DATABASE_USER=user
+      - DATABASE_PASSWORD=password
+      - DATABASE_NAME=price_service
+      - EUREKA_HOST=registry-service
+      - EUREKA_PORT=8761
+    networks:
+      - microservices
+
   nginx-proxy:
     container_name: nginx-proxy
     image: nginx:latest
@@ -55,5 +90,6 @@ services:
     links:
       - registry-service
       - product-service
+      - price-service
     networks:
       - microservices
