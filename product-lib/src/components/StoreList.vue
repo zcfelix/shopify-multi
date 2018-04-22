@@ -1,5 +1,5 @@
 <template>
-  <div id="app" class="container my-5">
+  <div class="container my-5">
     <h1 class="text-center">Stores</h1>
     <div class="row">
       <store v-for="store in stores" 
