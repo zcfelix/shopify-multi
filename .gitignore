@@ -42,3 +42,20 @@
 /refund-service/logs/
 /registry-service/logs/
 /user-service/logs/
+
+### front-end
+.DS_Store
+/product-lib/node-modules
+/product-lib/dist/
+/product-lib/npm-debug.log*
+/product-lib/yarn-debug.log*
+/product-lib/yarn-error.log*
+/product-lib/test/unit/coverage/
+
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
