@@ -6,7 +6,7 @@
         <h4 class="card-title">{{ name }}</h4>
         <div class="card-text">{{ description }}</div>
         <div class="row justify-content-end">
-          <button class="btn btn-primary">Enter</button>
+          <button @click="enterStore" class="btn btn-primary">Enter</button>
         </div>
       </div>
     </div>
@@ -16,7 +16,12 @@
 <script>
 export default {
   name: "store",
-  props: ['id', 'name', 'description', 'image']
+  props: ["id", "name", "description", "image"],
+  methods: {
+    enterStore() {
+      this.$router.push(`/stores/${this.id}`);
+    }
+  }
 };
 </script>
 

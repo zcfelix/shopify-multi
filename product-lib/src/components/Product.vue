@@ -18,7 +18,7 @@ export default {
   name: "store",
   props: ["id", "name", "description", "image", "price"],
   filters: {
-    dollars: num => `$${num / 100}`
+    dollars: num => `¥${num  * 1}`
   }
 };
 </script>

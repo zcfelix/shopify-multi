@@ -1,7 +1,8 @@
 <template>
   <div>
-    <store-list></store-list>
-    <product-list></product-list>
+    <router-view></router-view>
+    <!-- <store-list></store-list> -->
+    <!-- <product-list></product-list> -->
   </div>
 </template>
 

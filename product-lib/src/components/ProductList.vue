@@ -25,18 +25,29 @@ export default {
     };
   },
   created() {
-    this.getProducts();
+    this.getProducts(this.getPrice);
   },
   methods: {
-    getProducts() {
+    getProducts(getPrice) {
       axios
         .get("http://localhost/products")
         .then(resp => {
-          console.log(resp.data);
           this.products = resp.data.data;
-          this.products.forEach(s => s.image = "//placehold.it/200");
+          this.products.forEach(p => {
+            getPrice(p.id);
+            p.image = "//placehold.it/200";
+          });
+          console.log(this.products);
         })
-        .catch(error => console.error("error in getting store list"));
+        .catch(error => console.error("error in getting product list"));
+    },
+    getPrice(productId) {
+      axios
+        .get(`http://localhost/products/${productId}/current-price`)
+        .then(resp => {
+          this.products.find(p => p.id === productId).price = resp.data.data.amount;
+        })
+        .catch(error => console.error("error in gettting product price"));
     }
   }
 };
